@@ -28,6 +28,7 @@ create table if not exists public.diary_message_replies (
   content text not null check (length(trim(content)) between 1 and 500),
   created_at timestamptz not null default now()
 );
+alter table public.diary_message_replies add column if not exists parent_id uuid references public.diary_message_replies(id) on delete cascade;
 alter table public.diary_message_replies enable row level security;
 drop policy if exists "ppig replies read" on public.diary_message_replies;
 drop policy if exists "ppig replies insert" on public.diary_message_replies;
@@ -69,6 +70,7 @@ create table if not exists public.diary_emotion_comments (
   content text not null check (length(trim(content)) between 1 and 400),
   created_at timestamptz not null default now()
 );
+alter table public.diary_emotion_comments add column if not exists parent_id uuid references public.diary_emotion_comments(id) on delete cascade;
 alter table public.diary_emotion_comments enable row level security;
 drop policy if exists "ppig emotion comments read" on public.diary_emotion_comments;
 drop policy if exists "ppig emotion comments insert" on public.diary_emotion_comments;
