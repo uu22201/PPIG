@@ -22,6 +22,7 @@ alter table public.diary_messages
 create table if not exists public.diary_message_replies (
   id uuid primary key default gen_random_uuid(),
   message_id uuid not null references public.diary_messages(id) on delete cascade,
+  parent_id uuid references public.diary_message_replies(id) on delete cascade,
   couple_id uuid not null,
   user_id uuid not null references auth.users(id) on delete cascade,
   content text not null check (length(trim(content)) between 1 and 500),
@@ -80,3 +81,12 @@ with check (user_id = auth.uid() and public.ppig_is_couple_member(couple_id));
 grant select, insert on public.diary_message_replies to authenticated;
 grant select, insert, update, delete on public.diary_calendar_events to authenticated;
 grant select, insert on public.diary_emotion_comments to authenticated;
+
+-- Allow authors to manage their own sticky notes (pin/delete).
+drop policy if exists "ppig messages update own" on public.diary_messages;
+drop policy if exists "ppig messages delete own" on public.diary_messages;
+create policy "ppig messages update own" on public.diary_messages for update to authenticated
+using (user_id = auth.uid() and public.ppig_is_couple_member(couple_id))
+with check (user_id = auth.uid() and public.ppig_is_couple_member(couple_id));
+create policy "ppig messages delete own" on public.diary_messages for delete to authenticated
+using (user_id = auth.uid() and public.ppig_is_couple_member(couple_id));
