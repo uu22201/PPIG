@@ -84,6 +84,9 @@ grant select, insert on public.diary_message_replies to authenticated;
 grant select, insert, update, delete on public.diary_calendar_events to authenticated;
 grant select, insert on public.diary_emotion_comments to authenticated;
 
+-- Explicit table privileges are required in addition to RLS policies.
+grant select, insert, update, delete on public.diary_messages to authenticated;
+
 -- Allow authors to manage their own sticky notes (pin/delete).
 drop policy if exists "ppig messages update own" on public.diary_messages;
 drop policy if exists "ppig messages delete own" on public.diary_messages;
